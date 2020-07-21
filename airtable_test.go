@@ -17,7 +17,7 @@ func TestAirtable(t *testing.T) {
 			BaseId: "def",
 		}
 	}
-	
+
 	testAcc := acc()
 	tbl := NewTable("test", testAcc)
 	Convey("NewTable returns GenericTable struct", t, func() {

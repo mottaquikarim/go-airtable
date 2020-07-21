@@ -6,8 +6,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 )
 
 type Table interface {
@@ -21,7 +21,7 @@ type GenericTable struct {
 	View    string
 }
 
-// getFullUrl builds the URL for making API call 
+// getFullUrl builds the URL for making API call
 func (t *GenericTable) getFullUrl() string {
 	return fmt.Sprintf("%s/v%s/%s/%s", t.account.BaseUrl, VERSION, t.account.BaseId, t.Name)
 }
@@ -72,7 +72,7 @@ func (t *GenericTable) List(opts Options) ([]Record, error) {
 	// add sorting if provided
 	// sorting must be assembled as follows:
 	// [{"field": "my-field-name", "direction": "asc|desc"}]
-	// this is converted to: 
+	// this is converted to:
 	// 		sort[0][field]=my-field-name
 	// 		sort[0][direction]=asc|desc
 	if len(opts.Sort) > 0 {

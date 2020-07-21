@@ -62,7 +62,14 @@ func (t *GenericTable) List(opts Options) ([]Record, error) {
 	}
 
 	// add view
-	q.Add("view", t.View)
+	switch len(opts.View) {
+	case 0:
+		q.Add("view", fmt.Sprint(VIEWNAME))
+		break
+	default:
+		q.Add("view", fmt.Sprint(opts.View))
+		break
+	}
 
 	// add filters if they exist
 	if len(opts.Filter) > 0 {

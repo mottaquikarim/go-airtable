@@ -14,6 +14,7 @@ type Options struct {
 	Filter     string
 	Sort       []map[string]string
 	MaxRecords int
+	View       string
 }
 
 type records struct {

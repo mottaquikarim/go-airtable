@@ -10,6 +10,10 @@ go get github.com/mottaquikarim/go-airtable
 
 ## Usage
 
+Let's make a simple request to the [pokédex](https://airtable.com/shrOgMitqYo4PE2GW). You can copy this base by clicking the top left "Copy" button and test against this data yourself 👍.
+
+![img](assets/airtable.png)
+
 ```go
 import (
   "github.com/mottaquikarim/go-airtable"
@@ -19,10 +23,24 @@ acc := airtable.Account{
   ApiKey: "XXXX",
   BaseId: "XXXX",
 }
+
 pokédex := airtable.NewTable("pokémon", acc)
-original_generation, err := pokédex.List(airtable.Options{})
+original_generation, err := pokédex.List(airtable.Options{
+	// Airtable has an API limit of 100 records per page
+	MaxRecords: 100,
+	// override the default "Grid view" name
+	View: "All",
+})
 if err != nil {
   // handle error
+  log.Printf("Error! %v", err)
+}
+
+// returned is []Record struct, which contains a Field prop
+// that is map[string]interface{} - this can be used anyway
+// you like
+for _, pokémon := range(original_generation) {
+	log.Printf("ID: %s Name: %v", pokémon.Fields["ID"], pokémon.Fields["Name"])
 }
 ```
 

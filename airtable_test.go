@@ -54,7 +54,8 @@ func TestAirtable(t *testing.T) {
 	Convey("all filters work", t, func(c C) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c.So(r.URL.Query()["maxRecords"], ShouldResemble, []string{fmt.Sprint(MAXRECORDS)})
-			c.So(r.URL.Query()["view"], ShouldResemble, []string{VIEWNAME})
+			// no view explicitly set, so sends to table's "default view"
+			c.So(r.URL.Query()["view"], ShouldResemble, []string{VIEWNAME}) 
 			c.So(r.URL.Query()["filterByFormula"], ShouldResemble, []string{"NOT({HasRun})"})
 			c.So(r.URL.Query()["sort[0][field]"], ShouldResemble, []string{"Date"})
 			c.So(r.URL.Query()["sort[0][direction]"], ShouldResemble, []string{"desc"})
@@ -73,6 +74,21 @@ func TestAirtable(t *testing.T) {
 					"direction": "desc",
 				},
 			},
+		})
+	})
+
+	Convey("View is overrideable", t, func(c C) {
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			c.So(r.URL.Query()["view"], ShouldResemble, []string{"foobar"})
+			w.Write([]byte("test"))
+		}))
+		defer ts.Close()
+
+		testAcc := acc()
+		testAcc.BaseUrl = ts.URL
+		tbl := NewTable("hello", testAcc)
+		tbl.List(Options{
+			View: "foobar",
 		})
 	})
 

@@ -1,4 +1,4 @@
-![build](https://github.com/mottaquikarim/go-airtable/workflows/Build%20Status/badge.svg)
+![build](https://github.com/mottaquikarim/go-airtable/workflows/Build%20Status/badge.svg) [![GoDoc](https://godoc.org/github.com/mottaquikarim/go-airtable?status.svg)](https://godoc.org/github.com/mottaquikarim/go-airtable)
 # [Go Airtable](https://godoc.org/github.com/mottaquikarim/go-airtable)
 Simple Airtable client written in go
 

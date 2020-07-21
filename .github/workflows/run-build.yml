@@ -14,4 +14,9 @@ jobs:
 
     - name: Run unit tests
       run: |
-        make clean test
+        make clean fmt test
+
+    - name: Commits
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Apply fmt changes

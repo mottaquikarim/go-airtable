@@ -40,7 +40,7 @@ if err != nil {
 // that is map[string]interface{} - this can be used anyway
 // you like
 for _, pokémon := range original_generation {
-	log.Printf("ID: %s Name: %v", pokémon.Fields["ID"], pokémon.Fields["Name"])
+	log.Printf("ID: %s Name: %s", pokémon.Fields["ID"], pokémon.Fields["Name"])
 }
 ```
 

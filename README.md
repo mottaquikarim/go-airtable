@@ -1,4 +1,4 @@
-# Go Airtable
+# [Go Airtable](https://godoc.org/github.com/mottaquikarim/go-airtable)
 Simple Airtable client written in go
 
 ## Installation

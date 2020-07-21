@@ -1,0 +1,26 @@
+package airtable
+
+import (
+	"time"
+)
+
+type Account struct {
+	ApiKey string
+	BaseId string
+}
+
+type Options struct {
+	Filter     string
+	Sort       []map[string]string
+	MaxRecords int
+}
+
+type records struct {
+	Records []Record `json:"records"`
+}
+
+type Record struct {
+	CreatedTime *time.Time             `json:"createdTime,omitempty"`
+	ID          string                 `json:"id"`
+	Fields      map[string]interface{} `json:"fields"`
+}

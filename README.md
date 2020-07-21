@@ -31,5 +31,42 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
+### Run Tests
+
+```bash
+make test-dev
+```
+
+### Format
+
+```bash
+make fmt
+```
+
+### Lint
+
+```bash
+make lint
+```
+
+### CLI
+
+```bash
+make build
+```
+
+Then,
+
+```bash
+make run arguments="-help"
+```
+
+Output:
+```
+Usage: ./airtbl [flags]
+  -api-key="XXXXX": Airtable API Key
+  -base-id="XXXXX": Airtable Base Id
+```
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

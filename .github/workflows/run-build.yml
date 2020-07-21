@@ -14,9 +14,13 @@ jobs:
 
     - name: Run unit tests
       run: |
-        make clean fmt test
+        make clean test
 
-    - name: Commits
+    - name: Fmt and Lint
+      run: |
+        make lint fmt
+
+    - name: Commit fmt changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Apply fmt changes

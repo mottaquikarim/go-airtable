@@ -55,7 +55,7 @@ func TestAirtable(t *testing.T) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c.So(r.URL.Query()["maxRecords"], ShouldResemble, []string{fmt.Sprint(MAXRECORDS)})
 			// no view explicitly set, so sends to table's "default view"
-			c.So(r.URL.Query()["view"], ShouldResemble, []string{VIEWNAME}) 
+			c.So(r.URL.Query()["view"], ShouldResemble, []string{VIEWNAME})
 			c.So(r.URL.Query()["filterByFormula"], ShouldResemble, []string{"NOT({HasRun})"})
 			c.So(r.URL.Query()["sort[0][field]"], ShouldResemble, []string{"Date"})
 			c.So(r.URL.Query()["sort[0][direction]"], ShouldResemble, []string{"desc"})

@@ -32,14 +32,14 @@ func main() {
 	pokédex := airtable.NewTable("pokémon", account)
 	original_generation, err := pokédex.List(airtable.Options{
 		MaxRecords: 100,
-		View: "All",
+		View:       "All",
 	})
 	if err != nil {
-	  // handle error
-	  log.Printf("Error! %v", err)
+		// handle error
+		log.Printf("Error! %v", err)
 	}
 
-	for _, pokémon := range(original_generation) {
+	for _, pokémon := range original_generation {
 		log.Printf("ID: %s Name: %v", pokémon.Fields["ID"], pokémon.Fields["Name"])
 	}
 }

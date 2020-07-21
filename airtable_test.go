@@ -39,14 +39,14 @@ func TestAirtable(t *testing.T) {
 	Convey("max records is passed along as expected", t, func(c C) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c.So(r.URL.Query()["maxRecords"], ShouldResemble, []string{"2"})
-			w.Write([]byte("test"))
+			_, _ = w.Write([]byte("test"))
 		}))
 		defer ts.Close()
 
 		testAcc := acc()
 		testAcc.BaseUrl = ts.URL
 		tbl := NewTable("hello", testAcc)
-		tbl.List(Options{
+		_, _ = tbl.List(Options{
 			MaxRecords: 2,
 		})
 	})
@@ -59,14 +59,14 @@ func TestAirtable(t *testing.T) {
 			c.So(r.URL.Query()["filterByFormula"], ShouldResemble, []string{"NOT({HasRun})"})
 			c.So(r.URL.Query()["sort[0][field]"], ShouldResemble, []string{"Date"})
 			c.So(r.URL.Query()["sort[0][direction]"], ShouldResemble, []string{"desc"})
-			w.Write([]byte("test"))
+			_, _ = w.Write([]byte("test"))
 		}))
 		defer ts.Close()
 
 		testAcc := acc()
 		testAcc.BaseUrl = ts.URL
 		tbl := NewTable("hello", testAcc)
-		tbl.List(Options{
+		_, _ = tbl.List(Options{
 			Filter: "NOT({HasRun})",
 			Sort: []map[string]string{
 				map[string]string{
@@ -80,14 +80,14 @@ func TestAirtable(t *testing.T) {
 	Convey("View is overrideable", t, func(c C) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c.So(r.URL.Query()["view"], ShouldResemble, []string{"foobar"})
-			w.Write([]byte("test"))
+			_, _ = w.Write([]byte("test"))
 		}))
 		defer ts.Close()
 
 		testAcc := acc()
 		testAcc.BaseUrl = ts.URL
 		tbl := NewTable("hello", testAcc)
-		tbl.List(Options{
+		_, _ = tbl.List(Options{
 			View: "foobar",
 		})
 	})
@@ -96,7 +96,7 @@ func TestAirtable(t *testing.T) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			body, _ := ioutil.ReadAll(r.Body)
 			c.So(string(body), ShouldEqual, `{"records":[{"id":"testId","fields":{"HasRun":true}}]}`)
-			w.Write([]byte("test"))
+			_, _ = w.Write([]byte("test"))
 		}))
 		defer ts.Close()
 

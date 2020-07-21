@@ -22,7 +22,11 @@ func usage() {
 
 func main() {
 	fs.Usage = usage
-	fs.Parse(os.Args[1:])
+	err := fs.Parse(os.Args[1:])
+	if err != nil {
+		log.Printf("Error parsing input %v", err)
+		os.Exit(1)
+	}
 
 	account := airtable.Account{
 		ApiKey: *apiKey,

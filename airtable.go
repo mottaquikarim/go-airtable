@@ -55,20 +55,16 @@ func (t *GenericTable) List(opts Options) ([]Record, error) {
 	switch opts.MaxRecords {
 	case 0:
 		q.Add("maxRecords", fmt.Sprint(MAXRECORDS))
-		break
 	default:
 		q.Add("maxRecords", fmt.Sprint(opts.MaxRecords))
-		break
 	}
 
 	// add view
 	switch len(opts.View) {
 	case 0:
 		q.Add("view", fmt.Sprint(VIEWNAME))
-		break
 	default:
 		q.Add("view", fmt.Sprint(opts.View))
-		break
 	}
 
 	// add filters if they exist
@@ -99,11 +95,10 @@ func (t *GenericTable) List(opts Options) ([]Record, error) {
 	// make request
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
-
 	if err != nil {
 		return []Record{}, fmt.Errorf("Error occured: %v", err)
 	}
+	defer resp.Body.Close()
 
 	// read response
 	body, err := ioutil.ReadAll(resp.Body)
@@ -144,11 +139,10 @@ func (t *GenericTable) Update(recs []Record) error {
 	// make request
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
-
 	if err != nil {
 		return fmt.Errorf("Failed to make request %v", err)
 	}
+	defer resp.Body.Close()
 
 	return nil
 }

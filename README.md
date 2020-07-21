@@ -20,8 +20,8 @@ import (
 )
 
 acc := airtable.Account{
-  ApiKey: "XXXX",
-  BaseId: "XXXX",
+	ApiKey: "XXXX",
+	BaseId: "XXXX",
 }
 
 pokédex := airtable.NewTable("pokémon", acc)
@@ -32,14 +32,14 @@ original_generation, err := pokédex.List(airtable.Options{
 	View: "All",
 })
 if err != nil {
-  // handle error
-  log.Printf("Error! %v", err)
+	// handle error
+	log.Printf("Error! %v", err)
 }
 
 // returned is []Record struct, which contains a Field prop
 // that is map[string]interface{} - this can be used anyway
 // you like
-for _, pokémon := range(original_generation) {
+for _, pokémon := range original_generation {
 	log.Printf("ID: %s Name: %v", pokémon.Fields["ID"], pokémon.Fields["Name"])
 }
 ```

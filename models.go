@@ -7,6 +7,7 @@ import (
 type Account struct {
 	ApiKey string
 	BaseId string
+	BaseUrl string
 }
 
 type Options struct {

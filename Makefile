@@ -24,12 +24,12 @@ clean:
 
 build:
 	docker run -w /app -v ${ROOT}:/app ${GOLANG_DOCKER_IMAGE} go mod download
-	docker run -w /app -v ${ROOT}:/app ${GOLANG_DOCKER_IMAGE} go build cmd/cli/airtbl.go
 
 #   Deletes container if exists
 #   Usage:
 #       make run arguments="-help"
 run:
+	docker run -w /app -v ${ROOT}:/app ${GOLANG_DOCKER_IMAGE} go build cmd/cli/airtbl.go
 	docker run -w /app -v ${ROOT}:/app ${GOLANG_DOCKER_IMAGE} ./airtbl ${arguments}
 
 #   Usage:

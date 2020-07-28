@@ -10,7 +10,7 @@ go get github.com/mottaquikarim/go-airtable
 
 ## Usage
 
-Let's make a simple request to the [pokédex](https://airtable.com/shrOgMitqYo4PE2GW). You can copy this base by clicking the top left "Copy" button and test against this data yourself 👍.
+Let's make a simple request to the [pokédex](https://airtable.com/shrOgMitqYo4PE2GW). You can copy this base by clicking the top right "Copy" button and test against this data yourself 👍.
 
 ![img](assets/airtable.png)
 

@@ -15,12 +15,12 @@ type Options struct {
 	Sort       []map[string]string
 	MaxRecords int
 	View       string
-    Offset     string
+	Offset     string
 }
 
 type records struct {
 	Records []Record `json:"records"`
-    Offset  string   `json:"offset"`
+	Offset  string   `json:"offset"`
 }
 
 type Record struct {

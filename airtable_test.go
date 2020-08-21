@@ -36,7 +36,7 @@ func TestAirtable(t *testing.T) {
 		So(ret, ShouldResemble, []Record(nil))
 	})
 
-    Convey("offset is passed along as expected, if there is one", t, func(c C) {
+	Convey("offset is passed along as expected, if there is one", t, func(c C) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c.So(r.URL.Query()["offset"], ShouldResemble, []string{"tableName/RandomOffset"})
 			_, _ = w.Write([]byte("test"))
@@ -50,8 +50,6 @@ func TestAirtable(t *testing.T) {
 			Offset: "tableName/RandomOffset",
 		})
 	})
-
-
 
 	Convey("max records is passed along as expected", t, func(c C) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

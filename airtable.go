@@ -41,7 +41,7 @@ func NewTable(name string, account Account) Table {
 }
 
 func (t *GenericTable) GenerateListRequest(opts Options) (*http.Request, error) {
-    // create req
+	// create req
 	req, err := http.NewRequest("GET", t.getFullUrl(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create request object")
@@ -58,10 +58,10 @@ func (t *GenericTable) GenerateListRequest(opts Options) (*http.Request, error) 
 		q.Add("maxRecords", fmt.Sprint(opts.MaxRecords))
 	}
 
-    // add offset
-    if opts.Offset != "" {
-        q.Add("offset", fmt.Sprint(opts.Offset))
-    }
+	// add offset
+	if opts.Offset != "" {
+		q.Add("offset", fmt.Sprint(opts.Offset))
+	}
 
 	// add view
 	switch len(opts.View) {
@@ -96,12 +96,11 @@ func (t *GenericTable) GenerateListRequest(opts Options) (*http.Request, error) 
 	// set headsers
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.account.ApiKey))
 
-    return req, nil
+	return req, nil
 }
 
-
 func doListRequest(req *http.Request) (records, error) {
-    // make request
+	// make request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -115,55 +114,51 @@ func doListRequest(req *http.Request) (records, error) {
 		return records{}, fmt.Errorf("Failed to read body: %v", err)
 	}
 
-
 	// unmarshal
 	ret := records{}
 	if err = json.Unmarshal(body, &ret); err != nil {
 		return records{}, fmt.Errorf("Failed to unmarshal response: %v", err)
 	}
 
-    return ret, err
+	return ret, err
 }
-
 
 // List returns a list of records from the Airtable.
 func (t *GenericTable) List(opts Options) ([]Record, error) {
-    req, err := t.GenerateListRequest(opts)
-    if err != nil {
+	req, err := t.GenerateListRequest(opts)
+	if err != nil {
 		return []Record{}, err
 	}
 
-    ret, err := doListRequest(req)
-    if err != nil {
-        return []Record{}, err
-    }
+	ret, err := doListRequest(req)
+	if err != nil {
+		return []Record{}, err
+	}
 
-    allRecords := ret.Records
+	allRecords := ret.Records
 
-    for {
-        if ret.Offset == "" {
-            break
-        }
+	for {
+		if ret.Offset == "" {
+			break
+		}
 
-        opts.Offset = ret.Offset
-        req, err := t.GenerateListRequest(opts)
-        if err != nil {
-		    return []Record{}, err
-	    }
-        new_ret, err := doListRequest(req)
-        if err != nil {
-            return []Record{}, err
-        }
+		opts.Offset = ret.Offset
+		req, err := t.GenerateListRequest(opts)
+		if err != nil {
+			return []Record{}, err
+		}
+		new_ret, err := doListRequest(req)
+		if err != nil {
+			return []Record{}, err
+		}
 
-        allRecords = append(allRecords, new_ret.Records...)
+		allRecords = append(allRecords, new_ret.Records...)
 
-	    ret = new_ret
-    }
+		ret = new_ret
+	}
 
-
-    return allRecords, nil
+	return allRecords, nil
 }
-
 
 // Update makes a PATCH request to all records provided to Airtable.
 func (t *GenericTable) Update(recs []Record) error {

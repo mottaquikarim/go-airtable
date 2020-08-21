@@ -36,6 +36,23 @@ func TestAirtable(t *testing.T) {
 		So(ret, ShouldResemble, []Record(nil))
 	})
 
+    Convey("offset is passed along as expected, if there is one", t, func(c C) {
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			c.So(r.URL.Query()["offset"], ShouldResemble, []string{"tableName/RandomOffset"})
+			_, _ = w.Write([]byte("test"))
+		}))
+		defer ts.Close()
+
+		testAcc := acc()
+		testAcc.BaseUrl = ts.URL
+		tbl := NewTable("hello", testAcc)
+		_, _ = tbl.List(Options{
+			Offset: "tableName/RandomOffset",
+		})
+	})
+
+
+
 	Convey("max records is passed along as expected", t, func(c C) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c.So(r.URL.Query()["maxRecords"], ShouldResemble, []string{"2"})
@@ -95,7 +112,7 @@ func TestAirtable(t *testing.T) {
 	Convey("Update sends correct request body", t, func(c C) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			body, _ := ioutil.ReadAll(r.Body)
-			c.So(string(body), ShouldEqual, `{"records":[{"id":"testId","fields":{"HasRun":true}}]}`)
+			c.So(string(body), ShouldEqual, `{"records":[{"id":"testId","fields":{"HasRun":true}}],"offset":""}`)
 			_, _ = w.Write([]byte("test"))
 		}))
 		defer ts.Close()

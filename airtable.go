@@ -40,7 +40,7 @@ func NewTable(name string, account Account) Table {
 	}
 }
 
-func (t *GenericTable) GenerateListRequest(opts Options) (*http.Request, error) {
+func (t *GenericTable) generateListRequest(opts Options) (*http.Request, error) {
 	// create req
 	req, err := http.NewRequest("GET", t.getFullUrl(), nil)
 	if err != nil {
@@ -99,7 +99,7 @@ func (t *GenericTable) GenerateListRequest(opts Options) (*http.Request, error) 
 	return req, nil
 }
 
-func doListRequest(req *http.Request) (records, error) {
+func (t *GenericTable) doListRequest(req *http.Request) (records, error) {
 	// make request
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -125,36 +125,34 @@ func doListRequest(req *http.Request) (records, error) {
 
 // List returns a list of records from the Airtable.
 func (t *GenericTable) List(opts Options) ([]Record, error) {
-	req, err := t.GenerateListRequest(opts)
+	req, err := t.generateListRequest(opts)
 	if err != nil {
 		return []Record{}, err
 	}
 
-	ret, err := doListRequest(req)
+	ret, err := t.doListRequest(req)
 	if err != nil {
 		return []Record{}, err
 	}
 
 	allRecords := ret.Records
-
 	for {
 		if ret.Offset == "" {
 			break
 		}
-
 		opts.Offset = ret.Offset
-		req, err := t.GenerateListRequest(opts)
+
+		req, err := t.generateListRequest(opts)
 		if err != nil {
 			return []Record{}, err
 		}
-		new_ret, err := doListRequest(req)
+		newRet, err := t.doListRequest(req)
 		if err != nil {
 			return []Record{}, err
 		}
 
-		allRecords = append(allRecords, new_ret.Records...)
-
-		ret = new_ret
+		allRecords = append(allRecords, newRet.Records...)
+		ret = newRet
 	}
 
 	return allRecords, nil

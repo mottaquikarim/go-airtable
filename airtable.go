@@ -40,119 +40,92 @@ func NewTable(name string, account Account) Table {
 	}
 }
 
-func (t *GenericTable) generateListRequest(opts Options) (*http.Request, error) {
-	// create req
-	req, err := http.NewRequest("GET", t.getFullUrl(), nil)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create request object")
-	}
-
-	// init query params
-	q := req.URL.Query()
-
-	// add maxrecords
-	switch opts.MaxRecords {
-	case 0:
-		q.Add("maxRecords", fmt.Sprint(MAXRECORDS))
-	default:
-		q.Add("maxRecords", fmt.Sprint(opts.MaxRecords))
-	}
-
-	// add offset
-	if opts.Offset != "" {
-		q.Add("offset", fmt.Sprint(opts.Offset))
-	}
-
-	// add view
-	switch len(opts.View) {
-	case 0:
-		q.Add("view", fmt.Sprint(VIEWNAME))
-	default:
-		q.Add("view", fmt.Sprint(opts.View))
-	}
-
-	// add filters if they exist
-	if len(opts.Filter) > 0 {
-		q.Add("filterByFormula", opts.Filter)
-	}
-
-	// add sorting if provided
-	// sorting must be assembled as follows:
-	// [{"field": "my-field-name", "direction": "asc|desc"}]
-	// this is converted to:
-	// 		sort[0][field]=my-field-name
-	// 		sort[0][direction]=asc|desc
-	if len(opts.Sort) > 0 {
-		for i, sort := range opts.Sort {
-			for key, val := range sort {
-				q.Add(fmt.Sprintf("sort[%d][%s]", i, key), val)
-			}
-		}
-	}
-
-	// encode everything
-	req.URL.RawQuery = q.Encode()
-
-	// set headsers
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.account.ApiKey))
-
-	return req, nil
-}
-
-func (t *GenericTable) doListRequest(req *http.Request) (records, error) {
-	// make request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return records{}, fmt.Errorf("Error occured: %v", err)
-	}
-	defer resp.Body.Close()
-
-	// read response
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return records{}, fmt.Errorf("Failed to read body: %v", err)
-	}
-
-	// unmarshal
-	ret := records{}
-	if err = json.Unmarshal(body, &ret); err != nil {
-		return records{}, fmt.Errorf("Failed to unmarshal response: %v", err)
-	}
-
-	return ret, err
-}
-
 // List returns a list of records from the Airtable.
 func (t *GenericTable) List(opts Options) ([]Record, error) {
-	req, err := t.generateListRequest(opts)
-	if err != nil {
-		return []Record{}, err
-	}
-
-	ret, err := t.doListRequest(req)
-	if err != nil {
-		return []Record{}, err
-	}
-
-	allRecords := ret.Records
+	allRecords := make([]Record, 0)
 	for {
+		// create req
+		req, err := http.NewRequest("GET", t.getFullUrl(), nil)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to create request object")
+		}
+
+		// init query params
+		q := req.URL.Query()
+
+		// add maxrecords
+		switch opts.MaxRecords {
+		case 0:
+			q.Add("maxRecords", fmt.Sprint(MAXRECORDS))
+		default:
+			q.Add("maxRecords", fmt.Sprint(opts.MaxRecords))
+		}
+
+		// add offset
+		if len(opts.Offset) > 0 {
+			q.Add("offset", opts.Offset)
+		}
+
+		// add view
+		switch len(opts.View) {
+		case 0:
+			q.Add("view", fmt.Sprint(VIEWNAME))
+		default:
+			q.Add("view", fmt.Sprint(opts.View))
+		}
+
+		// add filters if they exist
+		if len(opts.Filter) > 0 {
+			q.Add("filterByFormula", opts.Filter)
+		}
+
+		// add sorting if provided
+		// sorting must be assembled as follows:
+		// [{"field": "my-field-name", "direction": "asc|desc"}]
+		// this is converted to:
+		// 		sort[0][field]=my-field-name
+		// 		sort[0][direction]=asc|desc
+		if len(opts.Sort) > 0 {
+			for i, sort := range opts.Sort {
+				for key, val := range sort {
+					q.Add(fmt.Sprintf("sort[%d][%s]", i, key), val)
+				}
+			}
+		}
+
+		// encode everything
+		req.URL.RawQuery = q.Encode()
+
+		// set headsers
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.account.ApiKey))
+
+		// make request
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			return []Record{}, fmt.Errorf("Error occured: %v", err)
+		}
+		defer resp.Body.Close()
+
+		// read response
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return []Record{}, fmt.Errorf("Failed to read body: %v", err)
+		}
+
+		// unmarshal
+		ret := records{}
+		if err = json.Unmarshal(body, &ret); err != nil {
+			return []Record{}, fmt.Errorf("Failed to unmarshal response: %v", err)
+		}
+
+		allRecords = append(allRecords, ret.Records...)
+
+		// if an offset is returned then we have to redo the process
 		if ret.Offset == "" {
 			break
 		}
 		opts.Offset = ret.Offset
-
-		req, err := t.generateListRequest(opts)
-		if err != nil {
-			return []Record{}, err
-		}
-		newRet, err := t.doListRequest(req)
-		if err != nil {
-			return []Record{}, err
-		}
-
-		allRecords = append(allRecords, newRet.Records...)
-		ret = newRet
 	}
 
 	return allRecords, nil

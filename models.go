@@ -20,7 +20,7 @@ type Options struct {
 
 type records struct {
 	Records []Record `json:"records"`
-	Offset  string   `json:"offset"`
+	Offset  string   `json:"offset,omitempty"`
 }
 
 type Record struct {

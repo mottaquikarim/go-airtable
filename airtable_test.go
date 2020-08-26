@@ -33,7 +33,7 @@ func TestAirtable(t *testing.T) {
 	Convey("List returns records", t, func() {
 		ret, err := tbl.List(Options{})
 		So(err, ShouldEqual, nil)
-		So(ret, ShouldResemble, []Record(nil))
+		So(ret, ShouldResemble, []Record{})
 	})
 
 	Convey("a list of records is built through pagination", t, func(c C) {
@@ -46,7 +46,7 @@ func TestAirtable(t *testing.T) {
 
 			} else {
 				w.Header().Set("Content-Type", "application/json")
-				fmt.Fprintln(w, `{"records":[{"id":"testId2","fields":{"HasRun":true}}],"offset":""}`)
+				fmt.Fprintln(w, `{"records":[{"id":"testId2","fields":{"HasRun":true}}]}`)
 			}
 		}
 
@@ -84,7 +84,7 @@ func TestAirtable(t *testing.T) {
 		testAcc := acc()
 		testAcc.BaseUrl = ts.URL
 		tbl := NewTable("hello", testAcc)
-		_, _ = tbl.List(Options{})
+		tbl.List(Options{})
 	})
 
 	Convey("offset is passed along as expected, if there is one", t, func(c C) {
@@ -97,7 +97,7 @@ func TestAirtable(t *testing.T) {
 		testAcc := acc()
 		testAcc.BaseUrl = ts.URL
 		tbl := NewTable("hello", testAcc)
-		_, _ = tbl.List(Options{
+		tbl.List(Options{
 			Offset: "basetoken/RandomOffset",
 		})
 	})
@@ -161,7 +161,7 @@ func TestAirtable(t *testing.T) {
 	Convey("Update sends correct request body", t, func(c C) {
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			body, _ := ioutil.ReadAll(r.Body)
-			c.So(string(body), ShouldEqual, `{"records":[{"id":"testId","fields":{"HasRun":true}}],"offset":""}`)
+			c.So(string(body), ShouldEqual, `{"records":[{"id":"testId","fields":{"HasRun":true}}]}`)
 			_, _ = w.Write([]byte("test"))
 		}))
 		defer ts.Close()

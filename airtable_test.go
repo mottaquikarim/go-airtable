@@ -33,7 +33,73 @@ func TestAirtable(t *testing.T) {
 	Convey("List returns records", t, func() {
 		ret, err := tbl.List(Options{})
 		So(err, ShouldEqual, nil)
-		So(ret, ShouldResemble, []Record(nil))
+		So(ret, ShouldResemble, []Record{})
+	})
+
+	Convey("a list of records is built through pagination", t, func(c C) {
+		handler := func(w http.ResponseWriter, r *http.Request) {
+			is_first_request := len(r.URL.Query()["offset"]) == 0
+
+			if is_first_request {
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprintln(w, `{"records":[{"id":"testId","fields":{"HasRun":true}}],"offset":"basetoken/RandomOffset"}`)
+
+			} else {
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprintln(w, `{"records":[{"id":"testId2","fields":{"HasRun":true}}]}`)
+			}
+		}
+
+		ts := httptest.NewServer(http.HandlerFunc(handler))
+		defer ts.Close()
+
+		testAcc := acc()
+		testAcc.BaseUrl = ts.URL
+		tbl := NewTable("hello", testAcc)
+		records, err := tbl.List(Options{})
+
+		So(err, ShouldEqual, nil)
+		So(len(records), ShouldEqual, 2)
+		So(records[0].ID, ShouldEqual, "testId")
+		So(records[1].ID, ShouldEqual, "testId2")
+	})
+
+	Convey("an offset returned by the server is used in the following request", t, func(c C) {
+		handler := func(w http.ResponseWriter, r *http.Request) {
+			is_first_request := len(r.URL.Query()["offset"]) == 0
+
+			if is_first_request {
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprintln(w, `{"records":[], "offset":"basetoken/RandomOffset"}`)
+
+				c.So(r.URL.Query()["offset"], ShouldResemble, []string(nil))
+			} else {
+				c.So(r.URL.Query()["offset"], ShouldResemble, []string{"basetoken/RandomOffset"})
+			}
+		}
+
+		ts := httptest.NewServer(http.HandlerFunc(handler))
+		defer ts.Close()
+
+		testAcc := acc()
+		testAcc.BaseUrl = ts.URL
+		tbl := NewTable("hello", testAcc)
+		tbl.List(Options{})
+	})
+
+	Convey("offset is passed along as expected, if there is one", t, func(c C) {
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			c.So(r.URL.Query()["offset"], ShouldResemble, []string{"basetoken/RandomOffset"})
+			_, _ = w.Write([]byte("test"))
+		}))
+		defer ts.Close()
+
+		testAcc := acc()
+		testAcc.BaseUrl = ts.URL
+		tbl := NewTable("hello", testAcc)
+		tbl.List(Options{
+			Offset: "basetoken/RandomOffset",
+		})
 	})
 
 	Convey("max records is passed along as expected", t, func(c C) {

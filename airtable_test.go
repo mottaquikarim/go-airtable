@@ -84,7 +84,7 @@ func TestAirtable(t *testing.T) {
 		testAcc := acc()
 		testAcc.BaseUrl = ts.URL
 		tbl := NewTable("hello", testAcc)
-		tbl.List(Options{})
+		_, _ = tbl.List(Options{})
 	})
 
 	Convey("offset is passed along as expected, if there is one", t, func(c C) {
@@ -97,7 +97,7 @@ func TestAirtable(t *testing.T) {
 		testAcc := acc()
 		testAcc.BaseUrl = ts.URL
 		tbl := NewTable("hello", testAcc)
-		tbl.List(Options{
+		_, _ = tbl.List(Options{
 			Offset: "basetoken/RandomOffset",
 		})
 	})

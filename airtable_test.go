@@ -33,7 +33,7 @@ func TestAirtable(t *testing.T) {
 	Convey("List returns records", t, func() {
 		ret, err := tbl.List(Options{})
 		So(err, ShouldEqual, nil)
-		So(ret, ShouldResemble, []Record(nil))
+		So(ret, ShouldResemble, []Record{})
 	})
 
 	Convey("a list of records is built through pagination", t, func(c C) {

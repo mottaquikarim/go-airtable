@@ -125,37 +125,27 @@ func (t *GenericTable) doListRequest(req *http.Request) (records, error) {
 
 // List returns a list of records from the Airtable.
 func (t *GenericTable) List(opts Options) ([]Record, error) {
-	req, err := t.generateListRequest(opts)
-	if err != nil {
-		return []Record{}, err
-	}
+    records := make([]Record, 0)
+    for {
+        req, err := t.generateListRequest(opts)
+        if err != nil {
+            return []Record{}, err
+        }
 
-	ret, err := t.doListRequest(req)
-	if err != nil {
-		return []Record{}, err
-	}
+        ret, err := t.doListRequest(req)
+        if err != nil {
+            return []Record{}, err
+        }
 
-	allRecords := ret.Records
-	for {
+		records = append(records, ret.Records...)
+		opts.Offset = ret.Offset
+
 		if ret.Offset == "" {
 			break
 		}
-		opts.Offset = ret.Offset
+    }
 
-		req, err := t.generateListRequest(opts)
-		if err != nil {
-			return []Record{}, err
-		}
-		newRet, err := t.doListRequest(req)
-		if err != nil {
-			return []Record{}, err
-		}
-
-		allRecords = append(allRecords, newRet.Records...)
-		ret = newRet
-	}
-
-	return allRecords, nil
+	return records, nil
 }
 
 // Update makes a PATCH request to all records provided to Airtable.
